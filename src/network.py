@@ -1,8 +1,23 @@
+"""
+network.py
+~~~~~~~~~~
+
+A module to implement the stochastic gradient descent learning
+algorithm for a feedforward neural network.  Gradients are calculated
+using backpropagation.  Note that I have focused on making the code
+simple, easily readable, and easily modifiable.  It is not optimized,
+and omits many desirable features.
+"""
+
 # Standard library
 import random
+import time
 
 # Third-party libraries
 import numpy as np
+
+# Custom library
+import mnist_loader
 
 
 class Network(object):
@@ -122,3 +137,19 @@ def sigmoid(z):
 def sigmoid_prime(z):
     """Derivative of the sigmoid function."""
     return sigmoid(z) * (1 - sigmoid(z))
+
+
+if __name__ == "__main__":
+    training_data, validation_data, test_data = mnist_loader.load_data_wrapper()
+    print(test_data[1])
+    # t0 = time.time()
+    # net = Network([784, 30, 10])
+    # net.SGD(
+    #     training_data=training_data,
+    #     epochs=30,
+    #     mini_batch_size=10,
+    #     eta=3.0,
+    #     test_data=test_data,
+    # )
+    # t1 = time.time()
+    # print(f"Train time: {t1 - t0}")
