@@ -9,83 +9,79 @@ function usually called by our neural network code.
 """
 
 import gzip
-
-#### Libraries
-# Standard library
 import pickle
 
-# Third-party libraries
 import numpy as np
 
 
 def load_data():
-    """Return the MNIST data as a tuple containing the training data,
-    the validation data, and the test data.
-
-    The ``training_data`` is returned as a tuple with two entries.
-    The first entry contains the actual training images.  This is a
-    numpy ndarray with 50,000 entries.  Each entry is, in turn, a
-    numpy ndarray with 784 values, representing the 28 * 28 = 784
-    pixels in a single MNIST image.
-
-    The second entry in the ``training_data`` tuple is a numpy ndarray
-    containing 50,000 entries.  Those entries are just the digit
-    values (0...9) for the corresponding images contained in the first
-    entry of the tuple.
-
-    The ``validation_data`` and ``test_data`` are similar, except
-    each contains only 10,000 images.
-
-    This is a nice data format, but for use in neural networks it's
-    helpful to modify the format of the ``training_data`` a little.
-    That's done in the wrapper function ``load_data_wrapper()``, see
-    below.
     """
+    Load the MNIST dataset from a gzip file and return it as a tuple.
 
-    f = gzip.open("../data/mnist.pkl.gz")
-    training_data, validation_data, test_data = pickle.load(f, encoding="latin1")
-    f.close()
+    Returns:
+    tuple: A tuple containing the training data, validation data, and test data.
+        - training_data (tuple): Tuple with two entries:
+            - numpy.ndarray: Contains 50,000 entries, each representing a 28x28 image (784 pixels).
+            - numpy.ndarray: Contains 50,000 entries, each representing the digit (0-9) of the corresponding image.
+        - validation_data (tuple): Tuple similar to training_data but with 10,000 images.
+        - test_data (tuple): Tuple similar to validation_data but with 10,000 images.
 
-    return (training_data, validation_data, test_data)
+    Notes:
+    - The data is loaded from 'mnist.pkl.gz' file.
+    - Each image is represented as a 1D numpy array with 784 values (28x28 pixels).
+    """
+    with gzip.open("../data/mnist.pkl.gz", "rb") as f:
+        training_data, validation_data, test_data = pickle.load(f, encoding="latin1")
+
+    return training_data, validation_data, test_data
 
 
 def load_data_wrapper():
-    """Return a tuple containing ``(training_data, validation_data,
-    test_data)``. Based on ``load_data``, but the format is more
-    convenient for use in our implementation of neural networks.
+    """
+    Return formatted data suitable for neural network training based on the MNIST dataset.
 
-    In particular, ``training_data`` is a list containing 50,000
-    2-tuples ``(x, y)``.  ``x`` is a 784-dimensional numpy.ndarray
-    containing the input image.  ``y`` is a 10-dimensional
-    numpy.ndarray representing the unit vector corresponding to the
-    correct digit for ``x``.
+    Returns:
+    tuple: A tuple containing formatted training, validation, and test data.
+        - training_data (list): Contains 50,000 2-tuples (x, y):
+            - x (numpy.ndarray): 784-dimensional array representing an input image.
+            - y (numpy.ndarray): 10-dimensional unit vector representing the digit's correct classification.
+        - validation_data (list): Contains 10,000 2-tuples (x, y):
+            - x (numpy.ndarray): 784-dimensional array representing an input image.
+            - y (int): Integer representing the digit classification (0-9).
+        - test_data (list): Contains 10,000 2-tuples (x, y):
+            - x (numpy.ndarray): 784-dimensional array representing an input image.
+            - y (int): Integer representing the digit classification (0-9).
 
-    ``validation_data`` and ``test_data`` are lists containing 10,000
-    2-tuples ``(x, y)``.  In each case, ``x`` is a 784-dimensional
-    numpy.ndarry containing the input image, and ``y`` is the
-    corresponding classification, i.e., the digit values (integers)
-    corresponding to ``x``.
+    Notes:
+    - Uses the `load_data` function internally to load the MNIST dataset.
+    - Formats training_data into a list of 2-tuples with inputs (x) reshaped to (784, 1) and outputs (y) vectorized.
+    - Formats validation_data and test_data into lists of 2-tuples with inputs (x) reshaped to (784, 1) and outputs (y) as integers.
+    """
+    training_data, validation_data, test_data = load_data()
 
-    Obviously, this means we're using slightly different formats for
-    the training data and the validation / test data.  These formats
-    turn out to be the most convenient for use in our neural network
-    code."""
-    tr_d, va_d, te_d = load_data()
-    training_inputs = [np.reshape(x, (784, 1)) for x in tr_d[0]]
-    training_results = [vectorized_result(y) for y in tr_d[1]]
+    training_inputs = [np.reshape(x, (784, 1)) for x in training_data[0]]
+    training_results = [vectorized_result(y) for y in training_data[1]]
     training_data = list(zip(training_inputs, training_results))
-    validation_inputs = [np.reshape(x, (784, 1)) for x in va_d[0]]
-    validation_data = list(zip(validation_inputs, va_d[1]))
-    test_inputs = [np.reshape(x, (784, 1)) for x in te_d[0]]
-    test_data = list(zip(test_inputs, te_d[1]))
-    return (training_data, validation_data, test_data)
+
+    validation_inputs = [np.reshape(x, (784, 1)) for x in validation_data[0]]
+    validation_data = list(zip(validation_inputs, validation_data[1]))
+
+    test_inputs = [np.reshape(x, (784, 1)) for x in test_data[0]]
+    test_data = list(zip(test_inputs, test_data[1]))
+
+    return training_data, validation_data, test_data
 
 
 def vectorized_result(j):
-    """Return a 10-dimensional unit vector with a 1.0 in the jth
-    position and zeroes elsewhere.  This is used to convert a digit
-    (0...9) into a corresponding desired output from the neural
-    network."""
+    """
+    Convert a digit (0-9) into a corresponding 10-dimensional unit vector.
+
+    Parameters:
+    j (int): The digit to be converted into a one-hot encoded vector (0-9).
+
+    Returns:
+    numpy.ndarray: A 10-dimensional unit vector with a 1.0 in the jth position and 0.0 elsewhere.
+    """
     e = np.zeros((10, 1))
     e[j] = 1.0
     return e
