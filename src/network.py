@@ -9,10 +9,10 @@ simple, easily readable, and easily modifiable.  It is not optimized,
 and omits many desirable features.
 """
 
-# Standard library
+# Libaries
 import random
+import time
 
-# Third-party libraries
 import numpy as np
 
 # Custom library
@@ -92,6 +92,7 @@ class Network:
         if test_data:
             n_test = len(test_data)
         n = len(training_data)
+        t0 = time.time()
         for j in range(epochs):
             random.shuffle(training_data)
             mini_batches = [
@@ -101,9 +102,13 @@ class Network:
             for mini_batch in mini_batches:
                 self.update_mini_batch(mini_batch, eta)
             if test_data:
-                print(f"Epoch {j}: {self.evaluate(test_data)} / {n_test}")
+                print(
+                    f"Epoch {j}: {self.evaluate(test_data)} / {n_test} (elapsed time: {round(time.time() - t0, 2)}s)"
+                )
             else:
-                print(f"Epoch {j} complete")
+                print(
+                    f"Epoch {j} complete (elapsed time: {round(time.time() - t0, 2)}s)"
+                )
 
     def update_mini_batch(self, mini_batch, eta):
         """
@@ -243,7 +248,7 @@ if __name__ == "__main__":
     net = Network([784, 30, 10])
     net.SGD(
         training_data=train,
-        epochs=30,
+        epochs=3,
         mini_batch_size=10,
         eta=3.0,
         test_data=test,
