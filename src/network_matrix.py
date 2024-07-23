@@ -121,12 +121,19 @@ class Network:
         Example:
         >>> net.update_mini_batch(mini_batch, eta)
         """
+        # Initialize accumulators for gradients.
+        # They will store the sum of the gradients of the cost function
+        # w.r.t the biases and weights for each training example in the mini-batch.
         nabla_b = [np.zeros(b.shape) for b in self.biases]
         nabla_w = [np.zeros(w.shape) for w in self.weights]
+
+        # Compute gradients for each training example in the mini-batch
         for x, y in mini_batch:
             delta_nabla_b, delta_nabla_w = self.backprop(x, y)
             nabla_b = [nb + dnb for nb, dnb in zip(nabla_b, delta_nabla_b)]
             nabla_w = [nw + dnw for nw, dnw in zip(nabla_w, delta_nabla_w)]
+
+        # Average the gradients and update weights and biases
         self.weights = [
             w - (eta / len(mini_batch)) * nw for w, nw in zip(self.weights, nabla_w)
         ]
@@ -248,7 +255,7 @@ if __name__ == "__main__":
     net = Network([784, 30, 10])
     net.SGD(
         training_data=train,
-        epochs=3,
+        epochs=30,
         mini_batch_size=10,
         eta=3.0,
         test_data=test,
