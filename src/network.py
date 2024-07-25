@@ -3,13 +3,13 @@ network.py
 ~~~~~~~~~~
 
 A module to implement the stochastic gradient descent learning
-algorithm for a feedforward neural network.  Gradients are calculated
-using backpropagation.  Note that I have focused on making the code
-simple, easily readable, and easily modifiable.  It is not optimized,
-and omits many desirable features.
+algorithm for a feedforward neural network. Gradients are calculated
+using backpropagation. Note that the code focuses on simplicity,
+readability, and ease of modification. It is not optimized and omits
+many desirable features.
 """
 
-# Libaries
+# Libraries
 import random
 import time
 
@@ -26,21 +26,17 @@ class Network:
     Attributes:
     - sizes (list): List containing the number of neurons in each layer.
     - num_layers (int): Number of layers in the network.
-    - biases ()
+    - biases (list): List of bias vectors for each layer.
+    - weights (list): List of weight matrices for each layer.
 
     Methods:
     - __init__(sizes): Initialize the network with given layer sizes.
     - feedforward(a): Perform feedforward propagation to compute activations.
-    - SGD(training_data, epochs, mini_batch_size, eta, test_data=None):
-        Train the network using mini-batch stochastic gradient descent.
+    - SGD(training_data, epochs, mini_batch_size, eta, test_data=None): Train the network using mini-batch stochastic gradient descent.
     - update_mini_batch(mini_batch, eta): Update weights and biases using backpropagation for a mini-batch.
     - backprop(x, y): Compute gradients for the cost function using backpropagation.
     - evaluate(test_data): Evaluate the network's performance on test data.
     - cost_derivative(output_activations, y): Compute the derivative of the cost function.
-
-    Example usage:
-    >>> net = Network([784, 30, 10])
-    >>> net.SGD(training_data, 30, 10, 3.0, test_data=test_data)
     """
 
     def __init__(self, sizes):
@@ -49,13 +45,12 @@ class Network:
 
         Parameters:
         - sizes (list): List containing the number of neurons in each layer.
-
-        Example:
-        >>> net = Network([784, 30, 10])
         """
         self.num_layers = len(sizes)
         self.sizes = sizes
+        # Initialize biases for all layers except the input layer
         self.biases = [np.random.randn(y, 1) for y in sizes[1:]]
+        # Initialize weights for all layers
         self.weights = [np.random.randn(y, x) for x, y in zip(sizes[:-1], sizes[1:])]
 
     def feedforward(self, a):
@@ -66,11 +61,9 @@ class Network:
         - a (ndarray): Input activation vector for the network.
 
         Returns:
-        - activations (ndarray): Output activation after propagation through the network.
-
-        Example:
-        >>> output = net.feedforward(input_data)
+        - ndarray: Output activation after propagation through the network.
         """
+        # Iterate through each layer, applying weights, biases, and the sigmoid function
         for b, w in zip(self.biases, self.weights):
             a = sigmoid(np.dot(w, a) + b)
         return a
@@ -85,22 +78,22 @@ class Network:
         - mini_batch_size (int): Size of mini-batches for stochastic gradient descent.
         - eta (float): Learning rate.
         - test_data (list, optional): If provided, the network will be evaluated against test data after each epoch.
-
-        Example:
-        >>> net.SGD(training_data, 30, 10, 3.0, test_data=test_data)
         """
         if test_data:
             n_test = len(test_data)
         n = len(training_data)
-        t0 = time.time()
+        t0 = time.time()  # Track the start time for epoch duration measurement
         for j in range(epochs):
-            random.shuffle(training_data)
+            random.shuffle(training_data)  # Shuffle training data for each epoch
+            # Split training data into mini-batches
             mini_batches = [
                 training_data[k : k + mini_batch_size]
                 for k in range(0, n, mini_batch_size)
             ]
+            # Update network for each mini-batch
             for mini_batch in mini_batches:
                 self.update_mini_batch(mini_batch, eta)
+            # Evaluate and print the network's performance after each epoch if test data is provided
             if test_data:
                 print(
                     f"Epoch {j}: {self.evaluate(test_data)} / {n_test} (elapsed time: {round(time.time() - t0, 2)}s)"
@@ -117,13 +110,8 @@ class Network:
         Parameters:
         - mini_batch (list): List of tuples (x, y) representing mini-batch inputs and desired outputs.
         - eta (float): Learning rate.
-
-        Example:
-        >>> net.update_mini_batch(mini_batch, eta)
         """
-        # Initialize accumulators for gradients.
-        # They will store the sum of the gradients of the cost function
-        # w.r.t the biases and weights for each training example in the mini-batch.
+        # Initialize gradient accumulators for biases and weights
         nabla_b = [np.zeros(b.shape) for b in self.biases]
         nabla_w = [np.zeros(w.shape) for w in self.weights]
 
@@ -133,7 +121,7 @@ class Network:
             nabla_b = [nb + dnb for nb, dnb in zip(nabla_b, delta_nabla_b)]
             nabla_w = [nw + dnw for nw, dnw in zip(nabla_w, delta_nabla_w)]
 
-        # Average the gradients and update weights and biases
+        # Update weights and biases by averaging the gradients
         self.weights = [
             w - (eta / len(mini_batch)) * nw for w, nw in zip(self.weights, nabla_w)
         ]
@@ -143,45 +131,43 @@ class Network:
 
     def backprop(self, x, y):
         """
-        Return a tuple representing the gradient for the cost function C_x.
+        Compute gradients for the cost function using backpropagation for a single training example.
 
         Parameters:
         - x (ndarray): Input data for a single training example.
         - y (ndarray): Corresponding target output.
 
         Returns:
-        - nabla_b (list): Gradient of biases for each layer.
-        - nabla_w (list): Gradient of weights for each layer.
-
-        Example:
-        >>> nabla_b, nabla_w = net.backprop(x, y)
+        - tuple: Gradients of biases and weights for each layer.
         """
+        # Initialize gradients for biases and weights
         nabla_b = [np.zeros(b.shape) for b in self.biases]
         nabla_w = [np.zeros(w.shape) for w in self.weights]
 
-        # Feedforward
+        # Feedforward pass: compute activations for each layer
         activation = x
-        activations = [x]  # List to store all the activations, layer by layer
-        zs = []  # List to store all the z vectors, layer by layer
+        activations = [x]  # Store all activations, layer by layer
+        zs = []  # Store all z vectors (weighted inputs), layer by layer
         for b, w in zip(self.biases, self.weights):
             z = np.dot(w, activation) + b
             zs.append(z)
             activation = sigmoid(z)
             activations.append(activation)
 
-        # Backward pass
+        # Backward pass: compute gradient of the cost function
         delta = self.cost_derivative(activations[-1], y) * sigmoid_prime(zs[-1])
         nabla_b[-1] = delta
-        nabla_w[-1] = np.dot(delta, activations[-2].transpose())
+        nabla_w[-1] = np.dot(delta, activations[-2].T)
 
+        # Compute gradients for remaining layers
         for l in range(2, self.num_layers):
             z = zs[-l]
             sp = sigmoid_prime(z)
-            delta = np.dot(self.weights[-l + 1].transpose(), delta) * sp
+            delta = np.dot(self.weights[-l + 1].T, delta) * sp
             nabla_b[-l] = delta
-            nabla_w[-l] = np.dot(delta, activations[-l - 1].transpose())
+            nabla_w[-l] = np.dot(delta, activations[-l - 1].T)
 
-        return nabla_b, nabla_w
+        return (nabla_b, nabla_w)
 
     def evaluate(self, test_data):
         """
@@ -192,10 +178,8 @@ class Network:
 
         Returns:
         - int: Number of test inputs for which the network outputs the correct result.
-
-        Example:
-        >>> accuracy = net.evaluate(test_data)
         """
+        # Compute the network's output for each test example and compare to the expected result
         test_results = [(np.argmax(self.feedforward(x)), y) for (x, y) in test_data]
         return sum(int(x == y) for (x, y) in test_results)
 
@@ -209,9 +193,6 @@ class Network:
 
         Returns:
         - ndarray: Vector of partial derivatives ∂C_x / ∂a for the output activations.
-
-        Example:
-        >>> cost_derivative = net.cost_derivative(output_activations, y)
         """
         return output_activations - y
 
@@ -225,10 +206,6 @@ def sigmoid(z):
 
     Returns:
     - ndarray: Sigmoid of the input value or array.
-
-    Example:
-    >>> sigmoid(np.array([0, 1, 2]))
-    array([0.5       , 0.73105858, 0.88079708])
     """
     return 1.0 / (1.0 + np.exp(-z))
 
@@ -242,17 +219,16 @@ def sigmoid_prime(z):
 
     Returns:
     - ndarray: Derivative of the sigmoid function evaluated at the input value or array.
-
-    Example:
-    >>> sigmoid_prime(np.array([0, 1, 2]))
-    array([0.25      , 0.19661193, 0.10499359])
     """
     return sigmoid(z) * (1 - sigmoid(z))
 
 
 if __name__ == "__main__":
+    # Load training, validation, and test data using the custom mnist_loader
     train, validation, test = mnist_loader.load_data_wrapper()
+    # Initialize the neural network with a specified structure
     net = Network([784, 30, 10])
+    # Train the neural network using stochastic gradient descent
     net.SGD(
         training_data=train,
         epochs=30,
