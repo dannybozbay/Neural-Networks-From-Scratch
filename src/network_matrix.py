@@ -2,17 +2,14 @@
 network_matrix.py
 ~~~~~~~~~~
 
-A module to implement the stochastic gradient descent learning
-algorithm for a feedforward neural network. Gradients are calculated
-using backpropagation. Note that the code focuses on simplicity,
-readability, and ease of modification. It is not optimized and omits
-many desirable features.
+A faster version of network.py, implementing the stochastic
+gradient descent learning algorithm for a feedforward neural network.
 
-To increase training speed, the code implements a matrix-based approach 
-for computing the gradients of minibatches. Instead of looping through 
-each training example individually, inputs and outputs within a minibatch 
+Improved training speed results from the implementation of a matrix-based 
+approach for computing the gradients of mini-batches. Instead of looping through 
+each training example individually, inputs and outputs within a mini-batch 
 are processed as matrices. This allows for efficient computation using 
-matrix operations, speeding up the training process by about x2.
+matrix operations, speeding up the training process.
 """
 
 # Libraries
@@ -21,7 +18,6 @@ import time
 
 import numpy as np
 
-# Custom library
 import mnist_loader
 
 
@@ -32,7 +28,7 @@ class Network:
     Attributes:
     - sizes (list): List containing the number of neurons in each layer.
     - num_layers (int): Number of layers in the network.
-    - biases (list): List of bias vectors for each layer.
+    - biases (list): List of bias vectors for each layer (excluding input layer).
     - weights (list): List of weight matrices for each layer.
 
     Methods:
@@ -42,7 +38,7 @@ class Network:
     - update_mini_batch(mini_batch, eta): Update weights and biases using backpropagation for a mini-batch.
     - backprop(X, Y): Compute gradients for the cost function using backpropagation for a mini-batch.
     - evaluate(test_data): Evaluate the network's performance on test data.
-    - cost_derivative(output_activations, y): Compute the derivative of the cost function.
+    - cost_derivative(output_activations, Y): Compute the derivative of the cost function.
     """
 
     def __init__(self, sizes):
@@ -69,7 +65,6 @@ class Network:
         Returns:
         - ndarray: Output activation after propagation through the network.
         """
-        # Iterate through each layer, applying weights, biases, and the sigmoid function
         for b, w in zip(self.biases, self.weights):
             a = sigmoid(np.dot(w, a) + b)
         return a
@@ -118,10 +113,14 @@ class Network:
         - eta (float): Learning rate.
         """
         # Stack inputs horizontally
-        X = np.column_stack([x.ravel() for x, y in mini_batch])
+        X = np.column_stack(
+            [x.ravel() for x, y in mini_batch]
+        )  # Shape: (input_size, mini_batch_size)
 
         # Stack outputs horizontally
-        Y = np.column_stack([y.ravel() for x, y in mini_batch])
+        Y = np.column_stack(
+            [y.ravel() for x, y in mini_batch]
+        )  # Shape: (output_size, mini_batch_size)
 
         # Compute gradients for the entire mini-batch using backpropagation
         nabla_b, nabla_w = self.backprop(X, Y)
@@ -139,11 +138,13 @@ class Network:
         Compute gradients for the cost function using backpropagation for a mini-batch.
 
         Parameters:
-        - X (ndarray): Input data for the mini-batch.
-        - Y (ndarray): Corresponding target outputs.
+        - X (ndarray): Input data for the mini-batch. Shape: (input_size, mini_batch_size)
+        - Y (ndarray): Corresponding target outputs. Shape: (output_size, mini_batch_size)
 
         Returns:
         - tuple: Gradients of biases and weights for each layer.
+          nabla_b (list): Gradients for biases, each element has shape (neurons_in_layer, 1)
+          nabla_w (list): Gradients for weights, each element has shape (neurons_in_next_layer, neurons_in_layer)
         """
         # Initialize gradients for biases and weights
         nabla_b = [np.zeros(b.shape) for b in self.biases]
@@ -161,14 +162,18 @@ class Network:
 
         # Backward pass
         delta = self.cost_derivative(activations[-1], Y) * sigmoid_prime(Zs[-1])
-        nabla_b[-1] = np.sum(delta, axis=1, keepdims=True)
+        nabla_b[-1] = np.sum(
+            delta, axis=1, keepdims=True
+        )  # Sum over mini_batch dimension
         nabla_w[-1] = np.dot(delta, activations[-2].T)
 
         for l in range(2, self.num_layers):
             Z = Zs[-l]
             sp = sigmoid_prime(Z)
             delta = np.dot(self.weights[-l + 1].T, delta) * sp
-            nabla_b[-l] = np.sum(delta, axis=1, keepdims=True)
+            nabla_b[-l] = np.sum(
+                delta, axis=1, keepdims=True
+            )  # Sum over mini_batch dimension
             nabla_w[-l] = np.dot(delta, activations[-l - 1].T)
 
         return (nabla_b, nabla_w)
@@ -187,44 +192,44 @@ class Network:
         test_results = [(np.argmax(self.feedforward(x)), y) for (x, y) in test_data]
         return sum(int(x == y) for (x, y) in test_results)
 
-    def cost_derivative(self, output_activations, y):
+    def cost_derivative(self, output_activations, Y):
         """
         Compute the derivative of the cost function.
 
         Parameters:
-        - output_activations (ndarray): Output activations from the network.
-        - y (ndarray): Target output.
+        - output_activations (ndarray): Output activations from the network. Shape: (output_size, mini_batch_size)
+        - Y (ndarray): Target outputs. Shape: (output_size, mini_batch_size)
 
         Returns:
-        - ndarray: Vector of partial derivatives ∂C_x / ∂a for the output activations.
+        - ndarray: Vector of partial derivatives ∂C_x / ∂a for the output activations. Shape: (output_size, mini_batch_size)
         """
-        return output_activations - y
+        return output_activations - Y
 
 
-def sigmoid(z):
+def sigmoid(Z):
     """
     Compute the sigmoid function.
 
     Parameters:
-    - z (ndarray): Input value or array.
+    - Z (ndarray): Input value or array.
 
     Returns:
     - ndarray: Sigmoid of the input value or array.
     """
-    return 1.0 / (1.0 + np.exp(-z))
+    return 1.0 / (1.0 + np.exp(-Z))
 
 
-def sigmoid_prime(z):
+def sigmoid_prime(Z):
     """
     Compute the derivative of the sigmoid function.
 
     Parameters:
-    - z (ndarray): Input value or array.
+    - Z (ndarray): Input value or array.
 
     Returns:
     - ndarray: Derivative of the sigmoid function evaluated at the input value or array.
     """
-    return sigmoid(z) * (1 - sigmoid(z))
+    return sigmoid(Z) * (1 - sigmoid(Z))
 
 
 if __name__ == "__main__":
