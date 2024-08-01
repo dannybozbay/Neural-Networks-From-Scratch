@@ -18,20 +18,16 @@ import random
 import sys
 import time
 
-import matplotlib.pyplot as plt
 import numpy as np
-import scienceplots
 
 import mnist_loader
-
-plt.style.use(["science", "no-latex"])
 
 
 class QuadraticCost:
     """
     Quadratic cost function (Mean Squared Error).
     """
-    
+
     @staticmethod
     def fn(a, y):
         """
@@ -49,7 +45,7 @@ class QuadraticCost:
     @staticmethod
     def delta(z, a, y):
         """
-        Calculate the error deltas from the output layers in a minibatch using for the quadratic cost function.
+        Calculate the error delta for the output layer using the quadratic cost function.
 
         Parameters:
         - z (ndarray): Weighted input to the output layer.
@@ -66,7 +62,7 @@ class CrossEntropyCost:
     """
     Cross-entropy cost function.
     """
-    
+
     @staticmethod
     def fn(a, y):
         """
@@ -84,7 +80,7 @@ class CrossEntropyCost:
     @staticmethod
     def delta(z, a, y):
         """
-        Return the error delta from the output layer for the cross-entropy cost function.
+        Calculate the error delta for the output layer using the cross-entropy cost function.
 
         Parameters:
         - z (ndarray): Weighted input to the output layer.
@@ -100,11 +96,18 @@ class CrossEntropyCost:
 class Network:
     def __init__(self, sizes, cost=CrossEntropyCost):
         """
-        Initialize the neural network with given layer sizes.
+        Initialize the neural network with the given layer sizes and cost function.
 
         Parameters:
-        - sizes (list): List containing the number of neurons in each layer.
+        - sizes (list of int): List containing the number of neurons in each layer.
         - cost (class): The cost function to be used (QuadraticCost or CrossEntropyCost).
+
+        Attributes:
+        - num_layers (int): Number of layers in the network.
+        - sizes (list of int): List of layer sizes.
+        - cost (class): Cost function used.
+        - biases (list of ndarray): Biases for each layer.
+        - weights (list of ndarray): Weights for each layer.
         """
         self.num_layers = len(sizes)
         self.sizes = sizes
@@ -113,13 +116,13 @@ class Network:
 
     def default_weight_initializer(self):
         """
-        Initialize each weight using a Gaussian distribution with mean 0
-        and standard deviation 1 over the square root of the number of
-        input connections to the neuron. Initialize the biases using a
-        Gaussian distribution with mean 0 and standard deviation 1.
+        Initialize weights and biases using a Gaussian distribution.
 
-        Note that the first layer is assumed to be an input layer, and
-        by convention we won't set any biases for those neurons.
+        Weights are initialized with mean 0 and standard deviation 1 over the square root of the number
+        of input connections. Biases are initialized with mean 0 and standard deviation 1.
+
+        Note:
+        - The first layer is assumed to be an input layer and has no biases.
         """
         self.biases = [np.random.randn(y, 1) for y in self.sizes[1:]]
         self.weights = [
@@ -129,16 +132,11 @@ class Network:
 
     def large_weight_initializer(self):
         """
-        Initialize the weights using a Gaussian distribution with mean 0
-        and standard deviation 1. Initialize the biases using a
-        Gaussian distribution with mean 0 and standard deviation 1.
+        Initialize weights and biases using a Gaussian distribution with mean 0 and standard deviation 1.
 
-        Note that the first layer is assumed to be an input layer, and
-        by convention we won't set any biases for those neurons.
-
-        This weight and bias initializer uses the same approach as in
-        Chapter 1, and is included for purposes of comparison. It
-        will usually be better to use the default weight initializer instead.
+        Note:
+        - The first layer is assumed to be an input layer and has no biases.
+        - This initializer may not perform as well as the default initializer.
         """
         self.biases = [np.random.randn(y, 1) for y in self.sizes[1:]]
         self.weights = [
@@ -147,13 +145,13 @@ class Network:
 
     def feedforward(self, a):
         """
-        Perform feedforward propagation, computing activations using weights and biases.
+        Perform feedforward propagation through the network.
 
         Parameters:
-        - a (ndarray): Input activation vector for the network.
+        - a (ndarray): Input activation vector.
 
         Returns:
-        - ndarray: Output activation after propagation through the network.
+        - ndarray: Output activation after passing through the network.
         """
         for b, w in zip(self.biases, self.weights):
             a = sigmoid(np.dot(w, a) + b)
@@ -176,19 +174,19 @@ class Network:
         Train the neural network using mini-batch stochastic gradient descent.
 
         Parameters:
-        - training_data (list): List of tuples (x, y) representing training inputs and desired outputs.
-        - epochs (int): Number of training epochs.
-        - mini_batch_size (int): Size of mini-batches for stochastic gradient descent.
+        - training_data (list of tuples): List of tuples (x, y) representing training inputs and desired outputs.
+        - epochs (int): Number of epochs for training.
+        - mini_batch_size (int): Size of each mini-batch for stochastic gradient descent.
         - eta (float): Learning rate.
         - lmbda (float, optional): L2 regularization parameter (default is 0.0).
-        - evaluation_data (list, optional): If provided, the network will be evaluated against the test data after each epoch.
-        - monitor_evaluation_cost (bool, optional): Monitor cost on evaluation data (default is False).
-        - monitor_evaluation_accuracy (bool, optional): Monitor accuracy on evaluation data (default is False).
-        - monitor_training_cost (bool, optional): Monitor cost on training data (default is False).
-        - monitor_training_accuracy (bool, optional): Monitor accuracy on training data (default is False).
+        - evaluation_data (list of tuples, optional): Data to evaluate the network after each epoch.
+        - monitor_evaluation_cost (bool, optional): If True, monitor the cost on evaluation data (default is False).
+        - monitor_evaluation_accuracy (bool, optional): If True, monitor the accuracy on evaluation data (default is False).
+        - monitor_training_cost (bool, optional): If True, monitor the cost on training data (default is False).
+        - monitor_training_accuracy (bool, optional): If True, monitor the accuracy on training data (default is False).
 
         Returns:
-        - tuple: Lists containing evaluation cost, evaluation accuracy, training cost, and training accuracy for each epoch.
+        - tuple: Four lists containing evaluation cost, evaluation accuracy, training cost, and training accuracy for each epoch.
         """
         if evaluation_data:
             n_eval = len(evaluation_data)
@@ -227,10 +225,10 @@ class Network:
 
     def update_mini_batch(self, mini_batch, eta, lmbda, n):
         """
-        Update the network's weights and biases by applying gradient descent using backpropagation.
+        Update the network's weights and biases using gradient descent on a mini-batch.
 
         Parameters:
-        - mini_batch (list): List of tuples (x, y) representing mini-batch inputs and desired outputs.
+        - mini_batch (list of tuples): List of tuples (x, y) representing mini-batch inputs and desired outputs.
         - eta (float): Learning rate.
         - lmbda (float): L2 regularization parameter.
         - n (int): Total number of training examples.
@@ -253,18 +251,17 @@ class Network:
 
     def backprop(self, x, y):
         """
-        Perform backpropagation to compute gradients of the cost function.
+        Perform backpropagation on a single training example to compute the gradient of the cost function.
 
         Parameters:
-        - x (ndarray): Input data.
-        - y (ndarray): Desired output.
+        - x (ndarray): Input activation vector.
+        - y (ndarray): Desired output activation vector.
 
         Returns:
-        - tuple: Gradients of the biases and weights.
+        - tuple: Gradients of biases and weights for each layer.
         """
         nabla_b = [np.zeros(b.shape) for b in self.biases]
         nabla_w = [np.zeros(w.shape) for w in self.weights]
-
         activation = x
         activations = [x]  # Store all activations, layer by layer
         zs = []  # Store all z vectors (weighted inputs), layer by layer
@@ -292,54 +289,52 @@ class Network:
         Calculate the accuracy of the network on the provided data.
 
         Parameters:
-        - data (list): List of tuples (x, y) representing inputs and desired outputs.
-        - convert (bool): Whether to convert y to one-hot representation.
+        - data (list of tuples): List of tuples (x, y) representing inputs and desired outputs.
+        - convert (bool): If True, convert `y` to one-hot representation (default is False).
 
         Returns:
-        - int: Number of correct classifications.
+        - int: Number of correct predictions.
         """
-        if convert:
-            results = [
-                (np.argmax(self.feedforward(x)), np.argmax(y)) for (x, y) in data
-            ]
-        else:
-            results = [(np.argmax(self.feedforward(x)), y) for (x, y) in data]
-        return sum(int(x == y) for (x, y) in results)
+        results = (
+            [(np.argmax(self.feedforward(x)), np.argmax(y)) for x, y in data]
+            if convert
+            else [(np.argmax(self.feedforward(x)), y) for x, y in data]
+        )
+        return sum(int(x == y) for x, y in results)
 
     def total_cost(self, data, lmbda, convert=False):
         """
-        Calculate the total cost of the network on the provided data.
+        Calculate the total cost of the network on the provided data, including L2 regularization.
 
         Parameters:
-        - data (list): List of tuples (x, y) representing inputs and desired outputs.
+        - data (list of tuples): List of tuples (x, y) representing inputs and desired outputs.
         - lmbda (float): L2 regularization parameter.
-        - convert (bool): Whether to convert y to one-hot representation.
+        - convert (bool): If True, convert `y` to one-hot representation (default is False).
 
         Returns:
-        - float: Total cost.
+        - float: Total cost, including regularization term.
         """
-        n = len(data)
-        cost = 0.0
-        for x, y in data:
-            a = self.feedforward(x)
-            if convert:
-                y = mnist_loader.vectorized_result(y)
-            cost += self.cost.fn(a, y) / n
-        cost += 0.5 * (lmbda / n) * sum(np.linalg.norm(w) ** 2 for w in self.weights)
-        return cost
+        if convert:
+            data = [(x, vectorized_result(y)) for x, y in data]
+        # Propogate forward and calculate the total cost
+        c0 = sum(self.cost.fn(self.feedforward(x), y) for x, y in data)
+        # Add regularization term
+        cost = c0 + (0.5 * lmbda * sum(np.sum(w**2) for w in self.weights))
+        # Average by dividing by sample size
+        return cost / len(data)
 
     def save(self, filename):
         """
-        Save the neural network to a file.
+        Save the network to a file.
 
         Parameters:
-        - filename (str): Name of the file to save the network.
+        - filename (str): Name of the file to save the network to.
         """
         data = {
             "sizes": self.sizes,
             "weights": [w.tolist() for w in self.weights],
             "biases": [b.tolist() for b in self.biases],
-            "cost": str(self.cost.__name__),
+            "cost": self.cost.__name__,
         }
         with open(filename, "w") as f:
             json.dump(data, f)
@@ -347,28 +342,44 @@ class Network:
 
 def sigmoid(z):
     """
-    Compute the sigmoid function.
+    Compute the sigmoid activation function.
 
     Parameters:
-    - z (ndarray): Input value or array.
+    - z (ndarray or float): Input to the sigmoid function.
 
     Returns:
-    - ndarray: Sigmoid of the input value or array.
+    - ndarray or float: The sigmoid of the input.
     """
     return 1.0 / (1.0 + np.exp(-z))
 
 
 def sigmoid_prime(z):
     """
-    Compute the derivative of the sigmoid function.
+    Compute the derivative of the sigmoid activation function.
 
     Parameters:
-    - z (ndarray): Input value or array.
+    - z (ndarray or float): Input to the sigmoid function.
 
     Returns:
-    - ndarray: Derivative of the sigmoid function evaluated at the input value or array.
+    - ndarray or float: The derivative of the sigmoid function.
     """
-    return sigmoid(z) * (1 - sigmoid(z))
+    sig = sigmoid(z)
+    return sig * (1 - sig)
+
+
+def vectorized_result(j):
+    """
+    Convert a digit (0-9) into a corresponding 10-dimensional unit vector.
+
+    Parameters:
+    j (int): The digit to be converted into a one-hot encoded vector (0-9).
+
+    Returns:
+    numpy.ndarray: A 10-dimensional unit vector with a 1.0 in the jth position and 0.0 elsewhere.
+    """
+    e = np.zeros((10, 1))
+    e[j] = 1.0
+    return e
 
 
 #### Loading a Network
@@ -389,70 +400,3 @@ def load(filename):
     net.weights = [np.array(w) for w in data["weights"]]
     net.biases = [np.array(b) for b in data["biases"]]
     return net
-
-
-if __name__ == "__main__":
-    train, valid, test = mnist_loader.load_data_wrapper()
-    net = Network([784, 30, 10], cost=CrossEntropyCost)
-
-    # Train with large weights initializer
-    net.large_weight_initializer()
-    valid_cost1, valid_acc1, train_cost1, train_acc1 = net.SGD(
-        training_data=train,
-        epochs=30,
-        mini_batch_size=10,
-        eta=0.5,
-        lmbda=5.0,
-        evaluation_data=valid,
-        monitor_evaluation_accuracy=True,
-        monitor_training_accuracy=True,
-    )
-
-    # Train with improved weights initializer (now called defaul_weight_initializer)
-    net.default_weight_initializer()
-    valid_cost2, valid_acc2, train_cost2, train_acc2 = net.SGD(
-        training_data=train,
-        epochs=30,
-        mini_batch_size=10,
-        eta=0.5,
-        lmbda=5.0,
-        evaluation_data=valid,
-        monitor_evaluation_accuracy=True,
-        monitor_training_accuracy=True,
-    )
-
-    # Plot classification accuracies using large weighs initializer
-    fig = plt.figure(figsize=(10, 6))
-    plt.plot(valid_acc1, label="Validation data")
-    plt.plot(train_acc1, label="Training data", c="orange")
-    plt.title("Classification Accuracy (%) with Large Weights Initializer")
-    plt.xlabel("Epoch")
-    plt.xticks(np.arange(0, len(valid_acc1) + 1, 5))
-    plt.xlim(0, len(valid_acc1))
-    plt.legend()
-    plt.grid(True)
-    plt.savefig("../reports/figures/accuracy_large_weights.png", dpi=1000)
-
-    # Plot classification accuracies using improved weights initializer
-    fig = plt.figure(figsize=(10, 6))
-    plt.plot(valid_acc2, label="Validation data")
-    plt.plot(train_acc2, label="Training data", c="orange")
-    plt.title("Classification Accuracy (%) with Improved Weights Initializer")
-    plt.xlabel("Epoch")
-    plt.xticks(np.arange(0, len(valid_acc2) + 1, 5))
-    plt.xlim(0, len(valid_acc2))
-    plt.legend()
-    plt.grid(True)
-    plt.savefig("../reports/figures/accuracy_improved_weights.png", dpi=1000)
-
-    # Plot classification accuracies comparing original and improved weights initializer
-    fig = plt.figure(figsize=(10, 6))
-    plt.plot(valid_acc1, label="Original weights initialization")
-    plt.plot(valid_acc2, label="Improved weights initialization", c="orange")
-    plt.title("Classification Accuracy (%) On Evaluation Data")
-    plt.xlabel("Epoch")
-    plt.xticks(np.arange(0, len(valid_acc1) + 1, 5))
-    plt.xlim(0, len(valid_acc1))
-    plt.legend()
-    plt.grid(True)
-    plt.savefig("../reports/figures/accuracy_compare_weights.png", dpi=1000)
