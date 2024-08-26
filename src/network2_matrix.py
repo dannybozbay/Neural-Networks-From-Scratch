@@ -439,3 +439,33 @@ def load(filename):
     net.weights = [np.array(w) for w in data["weights"]]
     net.biases = [np.array(b) for b in data["biases"]]
     return net
+
+
+if __name__ == "__main__":
+    # Load training, validation, and test data using the custom mnist_loader
+    train, validation, test = mnist_loader.load_data_wrapper()
+    # Initialize the neural network with a specified structure
+    net = Network([784, 30, 10])
+    # Train the neural network using stochastic gradient descent
+    net.SGD(
+        training_data=train,
+        epochs=30,
+        mini_batch_size=10,
+        eta=3.0,
+        test_data=test,
+    )
+
+    eval_cost, eval_acc, training_cost, training_acc = net.SGD(
+        training_data=train,
+        epochs=10,
+        mini_batch_size=10,
+        eta=0.1,
+        lmbda=5.0,
+        evaluation_data=validation,
+        monitor_evaluation_accuracy=True,
+        monitor_training_accuracy=True,
+        monitor_evaluation_cost=True,
+        monitor_training_cost=True,
+    )
+
+    preds = net.feedforward(test)
