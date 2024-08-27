@@ -8,7 +8,7 @@ for handwritten digit recognition on the MNIST dataset.
 
 from collections import defaultdict
 
-import mnist_loader
+from data.mnist_loader import load_data
 
 
 def main():
@@ -21,7 +21,7 @@ def main():
     Example:
     >>> main()
     """
-    training_data, _, test_data = mnist_loader.load_data()
+    training_data, _, test_data = load_data()
     averages = avg_darkness(training_data)
     num_correct = sum(
         int(predict_digit(image, averages) == digit)

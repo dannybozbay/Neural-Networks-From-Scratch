@@ -15,15 +15,12 @@ Output:
 - A PNG file showing the plot of training and validation accuracy over epochs.
 """
 
-import numpy as np
-import pandas as pd
-
-import mnist_loader
-from network import Network
+from data.mnist_loader import load_data_wrapper
+from networks.network import Network
 from util import *
 
 # Load and preprocess MNIST data
-train, validation, test = mnist_loader.load_data_wrapper()
+train, validation, test = load_data_wrapper()
 
 # Initialize the neural network with 784 input neurons, one hidden layer of 30 neurons, and 10 output neurons
 net = Network([784, 30, 10])
@@ -41,5 +38,7 @@ training_acc, validation_acc = net.SGD(
 
 # Plot training and validation accuracy over epochs
 plot = plot_metrics(training_acc, validation_acc)
-plot.savefig("../reports/figures/test_plot.png")  # Save the plot to the specified path
+plot.savefig(
+    "../reports/figures/network_accuracy_layers_784_30_10_eta_3_epochs_30.png"
+)  # Save the plot to the specified path
 plt.show()  # Display the plot

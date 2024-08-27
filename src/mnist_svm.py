@@ -7,7 +7,7 @@ A module to demonstrate baseline classification using Support Vector Machines (S
 
 from sklearn import svm
 
-import mnist_loader
+from data.mnist_loader import load_data
 
 
 def svm_baseline():
@@ -26,7 +26,7 @@ def svm_baseline():
     - Utilizes the `mnist_loader` module to load and preprocess the MNIST dataset.
     """
     # Load MNIST dataset
-    training_data, _, test_data = mnist_loader.load_data()
+    training_data, _, test_data = load_data()
 
     # Prepare training and test data
     X_train, y_train = training_data[0], training_data[1]
