@@ -1,5 +1,5 @@
 """
-mnist_svm
+mnist_svm.py
 ~~~~~~~~~
 
 A module to demonstrate baseline classification using Support Vector Machines (SVM) on the MNIST dataset.
@@ -46,7 +46,3 @@ def svm_baseline():
 
     # Print classification accuracy
     print("Baseline classifier using a SVM: {0} / {1}".format(num_correct, len(y_test)))
-
-
-if __name__ == "__main__":
-    svm_baseline()

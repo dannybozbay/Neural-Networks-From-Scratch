@@ -1,5 +1,5 @@
 """
-network.py
+network1.py
 ~~~~~~~~~~
 
 A module implementing a simple feedforward neural network, trained using

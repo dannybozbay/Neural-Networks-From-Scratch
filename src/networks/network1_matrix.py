@@ -1,5 +1,5 @@
 """
-network_matrix.py
+network1_matrix.py
 ~~~~~~~~~~~~~~~~~
 
 An optimized version of the feedforward neural network implementation with

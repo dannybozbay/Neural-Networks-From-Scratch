@@ -1,5 +1,5 @@
 """
-util.py
+plots.py
 ~~~~~~~
 
 This module provides utility functions for plotting metrics during the training of neural networks. It includes

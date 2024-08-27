@@ -1,5 +1,5 @@
 """
-mnist_average_darkness.py
+mnist_avg_darkness.py
 ~~~~~~~~~~
 
 This script demonstrates a baseline classifier using average darkness of images
@@ -7,32 +7,6 @@ for handwritten digit recognition on the MNIST dataset.
 """
 
 from collections import defaultdict
-
-from data.mnist_loader import load_data
-
-
-def main():
-    """
-    Main function to load MNIST data, compute average darkness for each digit,
-    and evaluate a baseline classifier based on average darkness.
-
-    Prints the accuracy of the baseline classifier using average darkness.
-
-    Example:
-    >>> main()
-    """
-    training_data, _, test_data = load_data()
-    averages = avg_darkness(training_data)
-    num_correct = sum(
-        int(predict_digit(image, averages) == digit)
-        for image, digit in zip(test_data[0], test_data[1])
-    )
-
-    print(
-        "Baseline classifier using average darkness of image: {0} / {1}".format(
-            num_correct, len(test_data[1])
-        )
-    )
 
 
 def avg_darkness(training_data):
@@ -83,7 +57,3 @@ def predict_digit(image, averages):
     predicted_digit = min(distances, key=distances.get)
 
     return predicted_digit
-
-
-if __name__ == "__main__":
-    main()
