@@ -17,7 +17,7 @@ Output:
 
 from data import mnist_loader
 from networks import network1
-from util.plots import *
+from util.plots import plot_metrics
 
 # Load and preprocess MNIST data
 train, validation, test = mnist_loader.load_data_wrapper()
@@ -26,7 +26,7 @@ train, validation, test = mnist_loader.load_data_wrapper()
 net = network1.Network([784, 30, 10])
 
 # Train the network using stochastic gradient descent (SGD)
-training_acc, validation_acc = net.SGD(
+training_accuracy, validation_accuracy = net.SGD(
     training_data=train,
     epochs=30,
     mini_batch_size=10,
@@ -36,7 +36,13 @@ training_acc, validation_acc = net.SGD(
     monitor_validation_accuracy=True,
 )
 
-# Plot training and validation accuracy over epochs
-plot = plot_metrics(training_acc, validation_acc)
+accuracy_plot = plot_metrics(
+    [training_accuracy, validation_accuracy],
+    ["Training Data", "Validation Data"],
+    is_accuracy=True,
+)
+
 # Save the plot to the specified path
-plot.savefig("../reports/figures/network_accuracy_layers_784_30_10_eta_3_epochs_30.png")
+accuracy_plot.savefig(
+    "../reports/figures/network1/accuracy_layers_784_30_10_eta_3_epochs_30.png"
+)

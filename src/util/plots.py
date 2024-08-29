@@ -2,96 +2,129 @@
 plots.py
 ~~~~~~~
 
-This module provides utility functions for plotting metrics during the training of neural networks. It includes
-configurations for matplotlib to enhance the visual appearance of plots and a function to plot training, validation, 
-and test metrics over multiple epochs.
+
+This module provides utility functions for plotting metrics during neural network training, with enhanced visual
+appearance using `matplotlib` and `scienceplots`. It includes configurations for creating high-quality plots and 
+a function for plotting training, validation, and test metrics over multiple epochs.
 
 Key Features:
-- Configures matplotlib styles and parameters for consistent and high-quality plots.
-- Defines a function to plot training, validation, and test accuracy or other metrics over epochs.
+- Configures `matplotlib` with the `science` and `high-contrast` styles for consistent and visually distinct plots.
+- Customizes plot appearance settings such as grid lines and resolution.
+- Defines a function to plot multiple datasets, including training and validation metrics, with options for labeling,
+  and y-axis scaling.
 
 Functions:
-- plot_metrics: Plots the provided training, validation, and test metrics over epochs and returns the plot as a figure.
+- plot_metrics: Plots one or more datasets on a single graph with optional labels, custom x and y axis labels, and 
+  scaling for accuracy metrics. The function returns a `matplotlib` figure object for further manipulation or saving.
+
+Usage:
+- Import the module and call `plot_metrics` with the desired datasets and configuration parameters.
 """
 
 import matplotlib.pyplot as plt
 import numpy as np
 import scienceplots
 
-plt.style.use(["science", "ieee"])
-plt.rcParams["figure.dpi"] = 100
-plt.rcParams["savefig.dpi"] = 1000
-plt.rcParams["figure.autolayout"] = True
+plt.style.use(["science", "ieee", "high-contrast"])
 plt.rcParams["axes.grid"] = True
-plt.rcParams["legend.loc"] = "best"
+plt.rcParams["figure.dpi"] = 100
+plt.rcParams["savefig.dpi"] = 600
+
+from typing import List, Optional
 
 
 def plot_metrics(
-    training_data=[],
-    validation_data=[],
-    test_data=[],
-    metric_name="Accuracy",
-    ylabel="%",
-):
+    datasets: Optional[List[List[float]]] = None,
+    labels: Optional[List[str]] = None,
+    title: str = "",
+    xlabel: str = "Epochs",
+    ylabel: str = "",
+    is_accuracy: bool = False,
+) -> plt.Figure:
     """
-    Plots training, validation, and test metrics over epochs.
+    Plots multiple datasets on a single graph with optional labeling and customization.
 
     Parameters:
-    - training_data (list of float): List of metric values for the training dataset, indexed by epoch.
-    - validation_data (list of float): List of metric values for the validation dataset, indexed by epoch.
-    - test_data (list of float): List of metric values for the test dataset, indexed by epoch.
-    - metric_name (str): The name of the metric to display in the plot title. Default is "Accuracy".
-    - ylabel (str): The label for the y-axis. Default is "%".
+    - datasets (Optional[List[List[float]]]): A list containing the datasets to be plotted.
+      Each dataset should be an iterable of numeric values. Must provide at least one dataset.
+    - labels (Optional[List[str]]): A list of labels corresponding to each dataset.
+      The number of labels must match the number of datasets. Defaults to None.
+    - title (str): The title of the plot. Defaults to an empty string.
+    - xlabel (str): The label for the x-axis. Defaults to "Epochs".
+    - ylabel (str): The label for the y-axis. If `is_accuracy` is True, this is overridden to "%".
+      Defaults to an empty string.
+    - is_accuracy (bool): A flag to indicate if the y-axis represents accuracy. If True,
+      the y-axis is set to a percentage scale (0-100%) and the plot title is set to "Classification Accuracy".
+      Defaults to False.
 
     Returns:
-    - fig (matplotlib.figure.Figure): The figure object containing the plot.
+    - fig (matplotlib.figure.Figure): The matplotlib figure object containing the plot.
 
     Raises:
-    - ValueError: If none of the training_data, validation_data, or test_data are provided.
+    - ValueError: If no datasets are provided or if the number of labels does not match the number of datasets.
     """
 
-    # Check if at least one dataset is provided, raise an error if none are.
-    if not training_data and not validation_data and not test_data:
-        raise ValueError(
-            "At least one of training_data, validation_data, or test_data must be provided."
-        )
+    # Set default values for datasets and labels if they are None
+    datasets = datasets or []
+    labels = labels or []
 
-    # Dictionary to hold the data sets with their corresponding labels
-    data_sets = {
-        "Training Data": training_data,
-        "Validation Data": validation_data,
-        "Test Data": test_data,
-    }
+    # Validate that at least one dataset is provided
+    if not datasets:
+        raise ValueError("A dataset must be provided.")
+
+    # Check if labels are provided and their count matches the number of datasets
+    if labels and len(labels) != len(datasets):
+        raise ValueError(
+            "The number of labels provided must match the number of datasets provided."
+        )
 
     # Create a new figure for the plot
     fig = plt.figure()
 
-    # Iterate over the data sets and plot each if it is provided
-    for label, data in data_sets.items():
-        if data:  # Plot only if the data list is not empty
-            plt.plot(data, label=label)
+    # Plot each dataset with its corresponding label
+    [
+        plt.plot(range(1, len(data) + 1), data, label=label)
+        for data, label in zip(datasets, labels)
+    ]
 
-    # Set the title, labels, and other plot configurations
-    plt.title(f"{metric_name} over Epochs")
-    plt.xlabel("Epoch")
-    plt.ylabel(ylabel)
-
-    # Determine the maximum length of the data lists for setting x-axis ticks and limits
-    max_len = max(len(training_data), len(validation_data), len(test_data))
-
-    # Calculate the interval for x-axis ticks, aiming for approximately 7 ticks
-    tick_interval = max(1, max_len // 6)  # Ensure interval is at least 1
-
-    # Generate x-ticks and set the x-axis limits
-    xticks = np.arange(0, max_len + 1, tick_interval)
-    plt.xticks(xticks)
-    plt.xlim(0, max_len)
-
-    # If the metric is "Accuracy", set the y-axis limit to 100%
-    if metric_name == "Accuracy":
+    # Adjust plot settings for accuracy metric if applicable
+    if is_accuracy:
+        plt.title(r"Classification Accuracy (\%)")
         plt.ylim(top=100)
+        plt.ylabel("%")
+    else:
+        plt.title(title)
+        plt.ylabel(ylabel)
 
-    # Add a legend to the plot
+    # Set x-axis properties based on xlabel
+    if xlabel == "Epochs":
+        max_length = max(len(data) for data in datasets)
+        plt.xlim(1, max_length)
+
+        # Determine tick interval based on max_length
+        if max_length <= 10:
+            interval = 1
+        elif max_length <= 30:
+            interval = 5
+        elif max_length <= 50:
+            interval = 10
+        elif max_length <= 100:
+            interval = 20
+        elif max_length <= 300:
+            interval = 50
+        elif max_length <= 500:
+            interval = 100
+        elif max_length <= 1000:
+            interval = 200
+        else:
+            interval = 100  # Fallback for larger sizes, adjust if needed
+
+        # Set the x-ticks using the determined interval
+        ticks = np.arange(0, max_length + 1, interval)
+        ticks[0] = 1
+        plt.xticks(ticks)
+
+    plt.xlabel(xlabel)
     plt.legend()
 
     # Return the figure object for further manipulation or saving
