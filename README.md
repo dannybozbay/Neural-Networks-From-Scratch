@@ -7,9 +7,19 @@
 [![MIT License][license-shield]][license-url]
 [![LinkedIn][linkedin-shield]][linkedin-url]
 
-# Neural Networks From Scratch!
+<h1 align="center"> Neural Networks From Scratch!</h1> 
 
-Neural Networks From Scratch is a project that provides a comprehensive, hands-on approach to understanding and implementing neural networks from the ground up. It features a collection of Python scripts that cover the core concepts of neural network design, including various network architectures, training algorithms, and performance metrics.
+<div align="center">
+    <img src="https://i.postimg.cc/XqNtk99D/Neural-Networks-News-Image.png" alt="Logo" width="500" height="275">
+  </a>
+
+</div>
+
+## About The Project
+
+Ever wondered how modern deep learning libaries actually work? Neural Networks From Scratch is a project that provides a comprehensive, hands-on approach to understanding and implementing neural networks from the ground up. It features a collection of Python scripts that cover the core concepts of neural network design, including various network architectures, training algorithms, and performance metrics. 
+
+
 
 ## What It Does
 
