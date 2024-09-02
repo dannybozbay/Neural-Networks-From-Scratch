@@ -7,6 +7,7 @@
 [![MIT License][license-shield]][license-url]
 [![LinkedIn][linkedin-shield]][linkedin-url]
 
+
 <h1 align="center"> Neural Networks From Scratch!</h1> 
 
 <div align="center">
@@ -251,36 +252,20 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
  - [Neural Networks and Deep Learning - Michael Neilson](http://neuralnetworksanddeeplearning.com/)
 
 [contributors-shield]: https://img.shields.io/github/contributors/dannybozbay/Neural-Networks-From-Scratch.svg?style=for-the-badge
-
 [contributors-url]: https://github.com/dannybozbay/Neural-Networks-From-Scratch/graphs/contributors
 
 [forks-shield]: https://img.shields.io/github/forks/dannybozbay/Neural-Networks-From-Scratch.svg?style=for-the-badge
-
 [forks-url]: https://github.com/dannybozbay/Neural-Networks-From-Scratch/ƒƒƒƒnetwork/members
 
 [stars-shield]: https://img.shields.io/github/stars/dannybozbay/Neural-Networks-From-Scratch.svg?style=for-the-badge
-
 [stars-url]: https://github.com/dannybozbay/Neural-Networks-From-Scratch/stargazers
 
 [issues-shield]: https://img.shields.io/github/issues/dannybozbay/Neural-Networks-From-Scratch.svg?style=for-the-badge
-
 [issues-url]: https://github.com/dannybozbay/Neural-Networks-From-Scratch/issues
 
-[license-shield]: https://img.shields.io/github/license/dannybozbay/Neural-Networks-From-Scratch.svg?style=for-the-badge
-
-[license-url]: https://github.com/dannybozbay/Neural-Networks-From-Scratch/blob/master/LICENSE.txt
-
+[license-shield]: https://img.shields.io/github/license/dannybozbay/neural-networks-from-scratch.svg?style=for-the-badge
+[license-url]: https://github.com/dannybozbay/neural-networks-from-scratch/blob/master/LICENSE.txt
 
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
-
 [linkedin-url]: https://linkedin.com/in/dannybozbay
 
-[product-screenshot]: images/screenshot.png
-
-[Python.js]: https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54
-
-[Python-url]: https://www.python.org
-
-[Pandas.js]: https://img.shields.io/badge/pandas-%23150458.svg?style=for-the-badge&logo=pandas&logoColor=white
-
-[Pandas-url]: https://pandas.pydata.org
