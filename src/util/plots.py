@@ -21,16 +21,17 @@ Usage:
 - Import the module and call `plot_metrics` with the desired datasets and configuration parameters.
 """
 
+from typing import List, Optional
+
 import matplotlib.pyplot as plt
 import numpy as np
 import scienceplots
 
-plt.style.use(["science", "ieee", "high-contrast"])
-plt.rcParams["axes.grid"] = True
-plt.rcParams["figure.dpi"] = 100
-plt.rcParams["savefig.dpi"] = 600
-
-from typing import List, Optional
+plt.style.use(["science", "ieee", "grid", "std-colors"])
+# plt.rcParams["figure.dpi"] = 100
+# plt.rcParams["savefig.dpi"] = 600
+plt.rcParams["legend.fontsize"] = "xx-small"
+plt.rcParams["legend.loc"] = "best"
 
 
 def plot_metrics(
@@ -81,24 +82,29 @@ def plot_metrics(
     # Create a new figure for the plot
     fig = plt.figure()
 
-    # Plot each dataset with its corresponding label
-    [
-        plt.plot(range(1, len(data) + 1), data, label=label)
-        for data, label in zip(datasets, labels)
-    ]
+    # Determine the maximum length of the datasets
+    max_length = max(len(data) for data in datasets)
+    x_values = np.arange(
+        1, max_length + 1
+    )  # X-values representing epochs from 1 to max_length
+
+    # Plot each dataset with its corresponding label and x-values
+    for data, label in zip(datasets, labels):
+        plt.plot(
+            x_values[: len(data)], data, label=label
+        )  # Use x_values to align with epoch numbers
 
     # Adjust plot settings for accuracy metric if applicable
     if is_accuracy:
         plt.title(r"Classification Accuracy (\%)")
         plt.ylim(top=100)
-        plt.ylabel("%")
+        plt.ylabel(r"%")
     else:
         plt.title(title)
         plt.ylabel(ylabel)
 
     # Set x-axis properties based on xlabel
     if xlabel == "Epochs":
-        max_length = max(len(data) for data in datasets)
         plt.xlim(1, max_length)
 
         # Determine tick interval based on max_length
@@ -119,7 +125,7 @@ def plot_metrics(
         else:
             interval = 100  # Fallback for larger sizes, adjust if needed
 
-        # Set the x-ticks using the determined interval
+        # Set the x-ticks using the determined interval, starting from 1
         ticks = np.arange(0, max_length + 1, interval)
         ticks[0] = 1
         plt.xticks(ticks)

@@ -37,18 +37,18 @@ class Network:
     - weights (list of ndarray): List of weight matrices for each layer (connections between consecutive layers).
 
     Methods:
-    - __init__(sizes): Initialize the network with given layer sizes.
-    - feedforward(a): Perform feedforward propagation to compute activations for a given input.
-    - SGD(training_data, epochs, mini_batch_size, eta, validation_data=None, monitor_training_accuracy=False, monitor_validation_accuracy=False): Train the network using mini-batch stochastic gradient descent.
-    - update_mini_batch(mini_batch, eta): Update weights and biases using backpropagation for a given mini-batch.
-    - backprop(x, y): Compute gradients for the cost function using backpropagation for a single training example.
-    - accuracy(data, convert=False): Calculate the accuracy of the network on the given data.
-    - cost_derivative(output_activations, y): Compute the derivative of the cost function with respect to output activations.
+    - __init__(sizes): Initializes the network with given layer sizes.
+    - feedforward(a): Computes the output activations for a given input using feedforward propagation.
+    - SGD(training_data, epochs, mini_batch_size, eta, validation_data=None, monitor_training_accuracy=False, monitor_validation_accuracy=False): Trains the network using mini-batch stochastic gradient descent.
+    - update_mini_batch(mini_batch, eta): Updates weights and biases using backpropagation for a given mini-batch.
+    - backprop(x, y): Computes gradients for the cost function using backpropagation for a single training example.
+    - accuracy(data, convert=False): Calculates the accuracy of the network on the given data set.
+    - cost_derivative(output_activations, y): Computes the derivative of the cost function with respect to output activations.
     """
 
     def __init__(self, sizes):
         """
-        Initialize the neural network with given layer sizes and random weights and biases.
+        Initializes the neural network with given layer sizes and random weights and biases.
 
         Parameters:
         - sizes (list of int): List containing the number of neurons in each layer. The length of the list represents the number of layers in the network, including the input and output layers.
@@ -62,7 +62,7 @@ class Network:
 
     def feedforward(self, a):
         """
-        Perform feedforward propagation, computing activations using weights and biases.
+        Perform feedforward propagation for a single input vector.
 
         Parameters:
         - a (ndarray): Input activation vector, shape (input_size, 1).
@@ -88,7 +88,7 @@ class Network:
         monitor_validation_accuracy=False,
     ):
         """
-        Train the network using mini-batch stochastic gradient descent.
+        Trains the network using mini-batch stochastic gradient descent.
 
         Parameters:
         - training_data (list of tuples): List of tuples (x, y) representing training inputs and target outputs.
@@ -103,17 +103,13 @@ class Network:
         - tuple: Two lists containing training accuracy and validation accuracy per epoch, if monitoring is enabled.
         """
         n = len(training_data)  # Total number of training samples
-        training_acc, validation_acc = (
-            [],
-            [],
-        )  # Lists to store accuracy per epoch if monitoring
+        training_acc, validation_acc = [], []  # Lists to store accuracy per epoch
         t0 = time.time()  # Start time for measuring training duration
 
         # Iterate over the number of epochs
         for j in range(1, epochs + 1):
-            random.shuffle(
-                training_data
-            )  # Shuffle the training data to ensure randomness
+            # Shuffle the training data to ensure randomness
+            random.shuffle(training_data)
 
             # Create mini-batches from the shuffled training data
             mini_batches = [
@@ -123,33 +119,26 @@ class Network:
 
             # Iterate over each mini-batch and update the network's weights and biases
             for mini_batch in mini_batches:
-                self.update_mini_batch(
-                    mini_batch, eta
-                )  # Perform gradient descent on the mini-batch
+                # Perform gradient descent on the mini-batch
+                self.update_mini_batch(mini_batch, eta)
 
             # Print progress of the current epoch and elapsed time
             print(f"Epoch {j} complete (elapsed time: {time.time() - t0:.2f}s)")
-
             INDENT = " " * 4  # Indentation for printing accuracy results
 
             # Monitor and print training accuracy if enabled
             if monitor_training_accuracy:
-                accuracy = self.accuracy(
-                    training_data, convert=True
-                )  # Compute training accuracy
-                training_acc.append(accuracy)  # Store training accuracy for this epoch
-                print(f"{INDENT}Accuracy on training data: {accuracy:.2f}")
+                accuracy = self.accuracy(training_data, convert=True)
+                training_acc.append(accuracy)
+                print(f"{INDENT}Accuracy on training data: {accuracy:.2f}%")
+
             # Monitor and print validation accuracy if enabled
             if monitor_validation_accuracy:
-                accuracy = self.accuracy(
-                    validation_data, convert=False
-                )  # Compute validation accuracy
-                validation_acc.append(
-                    accuracy
-                )  # Store validation accuracy for this epoch
-                print(f"{INDENT}Accuracy on validation data: {accuracy:.2f}")
+                accuracy = self.accuracy(validation_data)
+                validation_acc.append(accuracy)
+                print(f"{INDENT}Accuracy on validation data: {accuracy:.2f}%")
 
-        return training_acc, validation_acc  # Return the collected accuracy data
+        return training_acc, validation_acc
 
     def update_mini_batch(self, mini_batch, eta):
         """
@@ -164,6 +153,7 @@ class Network:
         nabla_w = [np.zeros(w.shape) for w in self.weights]
 
         # Compute gradients for each training example in the mini-batch using backpropagation
+        # And add to the accumulators
         for x, y in mini_batch:
             delta_nabla_b, delta_nabla_w = self.backprop(x, y)
             nabla_b = [nb + dnb for nb, dnb in zip(nabla_b, delta_nabla_b)]
@@ -177,7 +167,7 @@ class Network:
 
     def backprop(self, x, y):
         """
-        Compute gradients for the cost function using backpropagation for a single training example.
+        Computes gradients for the cost function using backpropagation for a single training example.
 
         Parameters:
         - x (ndarray): Input data for a single training example, shape (input_size, 1).
@@ -185,8 +175,8 @@ class Network:
 
         Returns:
         - tuple: Two lists containing gradients for biases and weights for each layer.
-        - nabla_B (list of ndarray): Gradients for biases, each element has shape (neurons_in_layer, 1).
-        - nabla_W (list of ndarray): Gradients for weights, each element has shape (neurons_in_next_layer, neurons_in_layer).
+            - nabla_b (list of ndarray): Gradients for biases, each element has shape (neurons_in_layer, 1).
+            - nabla_w (list of ndarray): Gradients for weights, each element has shape (neurons_in_next_layer, neurons_in_layer).
         """
         # Initialize gradients for biases and weights
         nabla_b = [np.zeros(b.shape) for b in self.biases]
@@ -218,25 +208,21 @@ class Network:
 
     def accuracy(self, data, convert=False):
         """
-        Calculate the accuracy of the network on the given data.
+        Calculate the percentage of correct predictions made by the network on the given data.
 
         Parameters:
-        - data (list of tuples): List of tuples (x, y) where x is the input and y is the desired output.
-        - convert (bool, optional): If True, indicates that the true output data (Y) is in vectorized form and needs to be converted to label format. Default is False.
+        - data (list of tuples): List of tuples (x, y) representing inputs and desired outputs.
+        - convert (bool, optional): If True, indicates that the true output data (Y) is in vectorized form and needs to be converted to label format.
 
         Returns:
-        - float: Accuracy of the network in percentage.
+        - float: Percentage of correct predictions made by the network on the given data.
         """
-        m = len(data)  # Number of samples
         if convert:
-            results = [
-                (np.argmax(self.feedforward(x)), np.argmax(y)) for (x, y) in data
-            ]
+            results = [(np.argmax(self.feedforward(x)), np.argmax(y)) for x, y in data]
         else:
-            results = [(np.argmax(self.feedforward(x)), y) for (x, y) in data]
+            results = [(np.argmax(self.feedforward(x)), y) for x, y in data]
 
-        # Calculate the percentage of correctly classified samples
-        return sum(int(x == y) for (x, y) in results) / m * 100
+        return sum(int(x == y) for x, y in results) / len(data) * 100
 
     def cost_derivative(self, output_activations, y):
         """
@@ -249,7 +235,10 @@ class Network:
         Returns:
         - ndarray: Vector of derivative of the cost with respect to output activations, shape (output_size, 1).
         """
-        return output_activations - y  # Gradient of the quadratic cost function
+        return output_activations - y
+
+
+# Utility functions
 
 
 def sigmoid(z):

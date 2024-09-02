@@ -2,17 +2,9 @@
 run_network1_matrix.py
 ~~~~~~~~~~~~~~~
 
-This script loads the MNIST dataset, initializes an optimized version of the feedforward neural network from network1_matrix.py, and trains it using stochastic
-gradient descent (SGD). It tracks the training and validation accuracy over multiple epochs and generates a plot of these metrics.
+This script loads the MNIST dataset, initializes a neural network with one hidden layer using matrix operations,
+trains the network using stochastic gradient descent (SGD), and plots the training and validation accuracy.
 
-Steps:
-1. Load and preprocess the MNIST dataset.
-2. Set up a neural network with specified architecture.
-3. Train the network using SGD with monitoring of accuracy.
-4. Plot and save the training and validation accuracy.
-
-Output:
-- A PNG file showing the plot of training and validation accuracy over epochs, saved in reports/figures.
 """
 
 from data import mnist_loader
@@ -36,13 +28,14 @@ training_accuracy, validation_accuracy = net.SGD(
     monitor_validation_accuracy=True,
 )
 
+# Plot accuracies
 accuracy_plot = plot_metrics(
     [training_accuracy, validation_accuracy],
     ["Training Data", "Validation Data"],
     is_accuracy=True,
 )
 
-# Save the plot to the specified path
+# Save the plot
 accuracy_plot.savefig(
     "../reports/figures/network1_matrix/accuracy_layers_784_30_10_eta_3_epochs_30.png"
 )
