@@ -270,6 +270,7 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 
 [license-url]: https://github.com/dannybozbay/Neural-Networks-From-Scratch/blob/master/LICENSE.txt
 
+
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 
 [linkedin-url]: https://linkedin.com/in/dannybozbay
