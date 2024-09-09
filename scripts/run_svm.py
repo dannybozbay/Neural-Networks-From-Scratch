@@ -1,4 +1,7 @@
-from baselines import mnist_svm
+import sys
 
-if __name__ == "__main__":
-    mnist_svm.svm_baseline()
+sys.path.append("..")
+
+from src.baselines.mnist_svm import svm_baseline
+
+svm_baseline()

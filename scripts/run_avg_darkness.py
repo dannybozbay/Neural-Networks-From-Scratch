@@ -1,5 +1,9 @@
-from baselines import mnist_avg_darkness
-from data import mnist_loader
+import sys
+
+sys.path.append("..")
+
+from src.baselines import mnist_avg_darkness
+from src.data import mnist_loader
 
 
 def main():

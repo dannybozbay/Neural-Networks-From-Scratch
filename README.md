@@ -128,14 +128,14 @@ Neural-Networks-From-Scratch/
 │   └── mnist.pkl.gz
 ├── reports/
 │   └── figures/
-│       ├── network1/
-│       ├── network1_matrix/
+│       ├── network/
+│       ├── network_matrix/
 │       ├── network2/
 │       └── network2_matrix/
 ├── scripts/
 │   ├── run_avg_darkness.py
-│   ├── run_network1.py
-│   ├── run_network1_matrix.py
+│   ├── run_network.py
+│   ├── run_network_matrix.py
 │   ├── run_network2_matrix.py
 │   └── run_svm.py
 └── src/
@@ -148,8 +148,8 @@ Neural-Networks-From-Scratch/
     │   └── mnist_loader.py
     ├── networks/
     │   ├── __init__.py
-    │   ├── network1.py
-    │   ├── network1_matrix.py
+    │   ├── network.py
+    │   ├── network_matrix.py
     │   ├── network2.py
     │   └── network2_matrix.py
     └── util/
@@ -161,15 +161,15 @@ Neural-Networks-From-Scratch/
 
 * **`data/`**: This directory contains the `mnist.pkl.gz `file, which stores the MNIST dataset. The dataset is used for training and evaluating the neural network models.
 
-* **`reports/figures/`**: This directory stores the output figures generated during model training and evaluation. Each subfolder corresponds to a specific network implementation (`network1`, `network1_matrix`, `network2`, `network2_matrix`).
+* **`reports/figures/`**: This directory stores the output figures generated during model training and evaluation. Each subfolder corresponds to a specific network implementation (`network`, `network_matrix`, `network2`, `network2_matrix`).
 
 * **`scripts/`**: The scripts folder contains Python scripts that run the training and evaluation of different models:
 
      * `run_avg_darkness.py`: Executes the average darkness baseline model.
 
      * `run_svm.py`: Executes the SVM baseline model
-     * `run_network1.py`: Trains and evaluates the `network1` model.
-     * `run_network1_matrix.py`: Trains and evaluates the `network1_matrix` model for improved training speed.
+     * `run_network.py`: Trains and evaluates the `network` model.
+     * `run_network_matrix.py`: Trains and evaluates the `network_matrix` model for improved training speed.
 
     * `run_network2_matrix.py`: Trains and evaluates the advanced `network2_matrix` model for improved performance and training speed.
 
@@ -184,8 +184,8 @@ Neural-Networks-From-Scratch/
         * `mnist_loader.py`: A module that loads and preprocesses the MNIST dataset for use in training and evaluation.
 
     * `networks/`: Contains neural network implementations:
-        * `network1.py`: A simple, initial implementation of a neural network.
-        * `network1_matrix.py`: An optimized version of network1 using matrix operations for improved training speed.
+        * `network.py`: A simple, initial implementation of a neural network.
+        * `network_matrix.py`: An optimized version of network using matrix operations for improved training speed.
         *   `network2.py`: A more advanced network with features like different cost functions, L2 regularization, and improved weight initialization.
         * `network2_matrix.py`: An optimized version of `network2` using matrix operations for improved training speed.
 
@@ -194,11 +194,11 @@ Neural-Networks-From-Scratch/
 
 ## Usage/Examples
 
-Below is a simple example using the `run_network1.py `script to demonstrate the workflow of loading data, initializing a neural network, training it, and visualizing the results. This script specifically handles the MNIST dataset, initializes a neural network with a single hidden layer, trains the network using stochastic gradient descent (SGD), and plots the accuracy over training epochs. 
+Below is a simple example using the `run_network.py `script to demonstrate the workflow of loading data, initializing a neural network, training it, and visualizing the results. This script specifically handles the MNIST dataset, initializes a neural network with a single hidden layer, trains the network using stochastic gradient descent (SGD), and plots the accuracy over training epochs. 
 
 ```python
 from data import mnist_loader
-from networks import network1
+from networks import network
 from util.plots import plot_metrics
 
 # Step 1: Load and preprocess the MNIST dataset
@@ -207,7 +207,7 @@ train, validation, test = mnist_loader.load_data_wrapper()
 # Step 2: Initialize the neural network
 # The network has 784 input neurons (for the 28x28 pixel images), 
 # one hidden layer with 30 neurons, and 10 output neurons (for the 10 digit classes)
-net = network1.Network([784, 30, 10])
+net = network.Network([784, 30, 10])
 
 # Step 3: Train the network using stochastic gradient descent (SGD)
 # Training for 30 epochs with mini-batches of size 10 and a learning rate of 3.0
@@ -231,7 +231,7 @@ accuracy_plot = plot_metrics(
 
 # Step 5: Save the accuracy plot to a file
 accuracy_plot.savefig(
-    "../reports/figures/network1/accuracy_layers_784_30_10_eta_3_epochs_30.png"
+    "../reports/figures/network/accuracy_layers_784_30_10_eta_3_epochs_30.png"
 )
 
 

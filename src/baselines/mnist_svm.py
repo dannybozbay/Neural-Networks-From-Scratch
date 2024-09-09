@@ -7,7 +7,7 @@ A module to demonstrate baseline classification using Support Vector Machines (S
 
 from sklearn import svm
 
-from data.mnist_loader import load_data
+from ..data.mnist_loader import load_data
 
 
 def svm_baseline():
