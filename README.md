@@ -11,23 +11,23 @@
 <h1 align="center"> Neural Networks From Scratch!</h1> 
 
 <div align="center">
-    <img src="https://i.postimg.cc/XqNtk99D/Neural-Networks-News-Image.png" alt="Logo" width="500" height="275">
+    <img src="https://images.theconversation.com/files/374303/original/file-20201210-18-elk4m.jpg?ixlib=rb-4.1.0&rect=0%2C22%2C7500%2C5591&q=45&auto=format&w=926&fit=clip" alt="Logo" width="500" height="300">
   </a>
 
 </div>
 
 ## About The Project
 
-Ever wondered how modern deep learning libraries actually work? Neural Networks From Scratch is a project that provides a comprehensive, hands-on approach to understanding and implementing neural networks from the ground up. It features a collection of Python scripts that cover the core concepts of neural network design, including various network architectures, training algorithms, and performance metrics. 
+Curious about how deep learning libraries work? Neural Networks From Scratch is a hands-on project that walks you through building neural networks from the ground up. It includes Python scripts covering core concepts like network architectures, training algorithms, and performance metrics.
 
-
+Additionally, there's an educational [Kaggle notebook](https://www.kaggle.com/code/danielbozbay/building-a-neural-network-from-scratch-numpy) that breaks down the framework step by step!
 
 ## What It Does
 
 * **Builds Neural Networks**: Implements a series of improved neural network frameworks with different architectures, cost functions, and optimization techniques.
 * **Trains Models**: Uses stochastic gradient descent (SGD) and backpropagation to train networks on real datasets like MNIST.
 * **Evaluates Performance**: Monitors and plots training and validation metrics to assess model performance.
-* **Compares Techniques***: Evaluates different cost functions, regularization strategies, and initialization methods to highlight their impact on network performance.
+* **Compares Techniques**: Evaluates different cost functions, regularization strategies, and initialization methods to highlight their impact on network performance.
 
 ## Who It's For
 
